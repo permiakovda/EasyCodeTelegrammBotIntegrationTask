@@ -2,9 +2,20 @@
 телеграмм бот для напоминая про ДР
 """
 
+# importing os module for environment variables
+import os
+# importing necessary functions from dotenv library
+from dotenv import load_dotenv, dotenv_values 
 import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+
+
+# loading variables from .env file
+load_dotenv() 
+
+# accessing and printing value
+TOKEN = os.getenv("BOT_TOKEN")
 
 # Включаем логирование
 logging.basicConfig(format='%(asctime)s — %(name)s — %(levelname)s — %(message)s', level=logging.INFO)
@@ -20,7 +31,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Основная функция
 def main():
     # Создаем приложение
-    application = Application.builder().token('6272186177:AAHGVe3k5UNwVEyrkeqJhODOP-u6QsBWMqc').build()
+    application = Application.builder().token(TOKEN).build()
     # Добавляем обработчики
     application.add_handler(CommandHandler('start', start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
