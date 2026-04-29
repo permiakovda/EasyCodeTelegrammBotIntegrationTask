@@ -74,3 +74,4 @@ def get_user(user_id):
             'created_at': row[5]
         }
     return None
+
