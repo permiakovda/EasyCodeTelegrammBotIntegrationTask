@@ -20,7 +20,7 @@ def init_db():
         username TEXT,
         first_name TEXT,
         last_name TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        frends_birthdays TEXT DEFAULT NULL
     )
     ''')
     

@@ -11,7 +11,6 @@ from db import init_db, add_user
 
 # Определяем функцию для обработки команды /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     # Инициализируем базу данных
     init_db()
     
@@ -23,7 +22,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id=user.id,
         username=user.username,
         first_name=user.first_name,
-        last_name=user.last_name
+        last_name=user.last_name,
+
     )
     
     # Отправляем приветственное сообщение
