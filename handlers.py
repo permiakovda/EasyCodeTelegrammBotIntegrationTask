@@ -23,7 +23,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         username=user.username,
         first_name=user.first_name,
         last_name=user.last_name,
-
     )
     
     # Отправляем приветственное сообщение
@@ -33,7 +32,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(update.message.text)
 
-
+# Определяем функцию для обработки неизвестных команд
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f'такой команды нет')
 
+# Определяем функцию для обработки команды /add_frend_birthday
+async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Получаем данные пользователя
+    user = update.effective_user
+    
+    # Получаем имя друга
+    frend_name = update.message.text.split(' ')[1]
+    frend_birthday = update.message.text.split(' ')[2]
+
+    print(f'новый дргу ${frend_name} с датой рождения {frend_birthday} у пользователя {user.username} ' )
+
+# Определяем функцию для обработки команды /help
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Отправляем сообщение с инструкцией по использованию бота
+    await update.message.reply_text('Чтобы добавить друга с датой рождения, отправьте команду /add_frend_birthday и имя друга, а затем дату в формате ДД.ММ.ГГГГ')

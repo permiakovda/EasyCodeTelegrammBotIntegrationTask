@@ -71,7 +71,7 @@ def get_user(user_id):
             'username': row[2],
             'first_name': row[3],
             'last_name': row[4],
-            'created_at': row[5]
+            'frends_birthdays': row[5]
         }
     return None
 
