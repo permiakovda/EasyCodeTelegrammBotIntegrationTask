@@ -15,7 +15,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from db import init_db, add_user
 
 # импорт модуля для обработки команд и сообщений
-from handlers import unknown, start, echo, add_frend_birthday, help
+from handlers import unknown, start, echo, add_frend_birthday, help, error
 
 # loading variables from .env file
 load_dotenv() 
@@ -38,6 +38,9 @@ def main():
 
     # Добавляем обработчик для неизвестных команд
     application.add_handler(MessageHandler(filters.COMMAND, unknown))
+
+    # Добавляем обработчик ошибок
+    application.add_error_handler(error)
 
     # Запускаем бота
     application.run_polling()
