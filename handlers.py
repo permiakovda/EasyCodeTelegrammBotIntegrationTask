@@ -5,7 +5,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from db import init_db, add_user, add_new_frend
-from utils import validate_date, NotValidDate
+from utils import validate_date, validate_only_letters, NotValidDate, NotValidName
 
 # для обработки ошибок
 import traceback
@@ -46,7 +46,7 @@ async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     # Получаем имя друга
     try:
-        frend_name = update.message.text.split(' ')[1]
+        frend_name = validate_only_letters(update.message.text.split(' ')[1])
         frend_birthday = validate_date(update.message.text.split(' ')[2])
 
         await update.message.reply_text(f'получены данные о {frend_name} с датой {frend_birthday.day}.{frend_birthday.month}')
@@ -54,6 +54,8 @@ async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     except NotValidDate as e:
         await update.message.reply_text('информация отправлена не по рекомендуемому формату')
+    except NotValidName as e:
+        await update.message.reply_text('такое имя не подойдет (спец символы, пробелы, числа не должны присутствовать)')
 
 
 

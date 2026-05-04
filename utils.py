@@ -11,6 +11,36 @@ class NotValidDate(Exception):
     def __init__(self, value):
         self.value = value
         super().__init__(f"неправльная дата: {value}")
+    
+# Создаём собственный класс ошибки уже существующего имени в БД
+class NotValidName(Exception):
+    """Ошибка: такое имя уже есть или оно пустое"""
+    def __init__(self, value):
+        self.value = value
+        super().__init__(f"недопустимое имя: {value}")
+
+
+
+
+# валидация имени
+def validate_only_letters(text: str) -> str:
+    """
+    Проверяет, что строка состоит только из букв.
+    Поддерживает буквы любых алфавитов (Unicode).
+    """
+
+    if not isinstance(text, str):
+        raise TypeError("Ожидается строка (str).")
+        
+    # Убираем пробелы по краям
+    text = text.strip()
+        
+    # Проверка: строка не пустая и состоит только из букв
+    if not(bool(text) and text.isalpha()):
+        raise NotValidName(text)
+    
+    return (text)
+
 
 
 # валидация даты
@@ -21,7 +51,6 @@ def validate_date(date):
     except Exception as e:
         raise NotValidDate(date)
 
-    
     return current_day
 
 

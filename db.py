@@ -75,6 +75,7 @@ def get_user(user_id):
         }
     return None
 
+
 def add_new_frend(user_id, frend_name, frend_birthday):
     """
     добавляем в бд информацию по новому другу и его ДР, если такого друга ещё нету в БД
@@ -87,39 +88,29 @@ def add_new_frend(user_id, frend_name, frend_birthday):
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        
-        # user_id = 1
-        # new_key = "city"
-        # new_value = "Amsterdam"
-
-        # cursor.execute(f"""
-        # UPDATE users
-        # SET info = json_set(info, '$.{new_key}', ?)
-        # WHERE id = ?
-        # """, (new_value, user_id))
-
-
-
-        popa = 'popa'
-
-
-
-        # обновить данные нужного ползователя
-        profile = {f"{frend_name}": f"{frend_birthday}"}
-        # cursor.execute("UPDATE users SET frends_birthdays = ? WHERE user_id = ?", (json.dumps(profile, ensure_ascii=False), user_id))
-        
-        cursor.execute("UPDATE users SET frends_birthdays = json_patch(frends_birthdays, ?) WHERE user_id = ?", (json.dumps(profile, ensure_ascii=False), user_id))
-        conn.commit()
-
         # получить инфу о существующих друзьях и их д.р.
         cursor.execute("SELECT frends_birthdays FROM users WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
         
         if result and result[0]:
             # Предполагаем, что frends_birthdays хранится как JSON-строка
-            print(json.loads(result[0]))
+            frends_birthdays = json.loads(result[0])
+            if frends_birthdays.get(frend_name) is not None:
+                print(frends_birthdays)
+
+            
+
         else:
             print('пусто')   # Пустой список, если нет записей
+        
+
+
+
+        profile = {f"{frend_name}": f"{frend_birthday}"} 
+        cursor.execute("UPDATE users SET frends_birthdays = json_patch(frends_birthdays, ?) WHERE user_id = ?", (json.dumps(profile, ensure_ascii=False), user_id))
+        conn.commit()
+
+        
 
 
 
