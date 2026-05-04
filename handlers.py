@@ -88,5 +88,5 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Опционально: уведомляем пользователя о внутренней ошибке
     if update and update.effective_message:
         await update.effective_message.reply_text(
-            f"Извини, произошла внутренняя ошибка. Разработчик уже уведомлён. {error}"
+            f"Извини, произошла внутренняя ошибка. {error}"
         )

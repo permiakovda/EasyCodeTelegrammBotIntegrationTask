@@ -1,6 +1,8 @@
 import sqlite3
 import json
 
+from utils import NameAlreadyExists
+
 def init_db():
     """
     Инициализирует базу данных, создает таблицу users, если она не существует.
@@ -96,16 +98,13 @@ def add_new_frend(user_id, frend_name, frend_birthday):
             # Предполагаем, что frends_birthdays хранится как JSON-строка
             frends_birthdays = json.loads(result[0])
             if frends_birthdays.get(frend_name) is not None:
-                print(frends_birthdays)
-
-            
-
+                raise NameAlreadyExists(frend_name)
         else:
             print('пусто')   # Пустой список, если нет записей
         
 
 
-
+        # Внедрить информацию о новом друге
         profile = {f"{frend_name}": f"{frend_birthday}"} 
         cursor.execute("UPDATE users SET frends_birthdays = json_patch(frends_birthdays, ?) WHERE user_id = ?", (json.dumps(profile, ensure_ascii=False), user_id))
         conn.commit()

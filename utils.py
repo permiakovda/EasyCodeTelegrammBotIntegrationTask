@@ -12,14 +12,19 @@ class NotValidDate(Exception):
         self.value = value
         super().__init__(f"неправльная дата: {value}")
     
-# Создаём собственный класс ошибки уже существующего имени в БД
+# Создаём собственный класс ошибки неправильного имени
 class NotValidName(Exception):
-    """Ошибка: такое имя уже есть или оно пустое"""
+    """Ошибка: такое имя неподходит"""
     def __init__(self, value):
         self.value = value
         super().__init__(f"недопустимое имя: {value}")
 
-
+# Создаём собственный класс ошибки уже существующего имени в БД
+class NameAlreadyExists(Exception):
+    """Ошибка: такое имя уже есть """
+    def __init__(self, value):
+        self.value = value
+        super().__init__(f"такое имя уже есть в бд: {value}")
 
 
 # валидация имени
