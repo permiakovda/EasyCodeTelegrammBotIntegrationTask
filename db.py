@@ -75,3 +75,48 @@ def get_user(user_id):
         }
     return None
 
+def add_new_frend(user_id, frend_name, frend_birthday):
+    """
+    добавляем в бд информацию по новому другу и его ДР, если такого друга ещё нету в БД
+    """
+    try:
+        # Определяем путь к базе данных
+        db_path = "users.db"
+        
+        # Создаем подключение к базе данных
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # получить инфу о существующих друзьях и их д.р.
+
+
+        # обновить данные нужного ползователя
+        sql = f"UPDATE users SET frends_birthdays = ? WHERE user_id = ?"
+        cursor.execute(sql, (frend_birthday, user_id))
+
+        try:
+            cursor.execute("SELECT frends_birthdays FROM users WHERE user_id = ?", (user_id,))
+            result = cursor.fetchone()
+        
+            if result and result[0]:
+                # Предполагаем, что frends_birthdays хранится как JSON-строка
+                print(result[0])
+            else:
+                print('пусто')   # Пустой список, если нет записей
+        except Exception as e:
+            print(f"Ошибка при чтении данных: {e}")
+        finally:
+            conn.close()
+
+        # conn.commit()
+        # cursor.close()
+        # conn.close()
+
+
+    except sqlite3.Error as error:
+        print("Ошибка при работе с SQLite", error)
+    finally:
+        if conn:
+            conn.close()
+            print("Соединение с SQLite закрыто")
+

@@ -4,8 +4,8 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import init_db, add_user
-from utils import validate_date
+from db import init_db, add_user, add_new_frend
+from utils import validate_date, NotValidDate
 
 # для обработки ошибок
 import traceback
@@ -50,10 +50,11 @@ async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE)
         frend_birthday = validate_date(update.message.text.split(' ')[2])
 
         await update.message.reply_text(f'получены данные о {frend_name} с датой {frend_birthday.day}.{frend_birthday.month}')
+        add_new_frend(user_id=user.id, frend_name=frend_name, frend_birthday=frend_birthday)
 
-
-    except:
+    except NotValidDate as e:
         await update.message.reply_text('информация отправлена не по рекомендуемому формату')
+
 
 
 
@@ -80,8 +81,10 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Для отладки: выводим traceback в консоль
     traceback.print_exception(type(error), error, error.__traceback__)
 
+    print(error)
+
     # Опционально: уведомляем пользователя о внутренней ошибке
     if update and update.effective_message:
         await update.effective_message.reply_text(
-            "Извини, произошла внутренняя ошибка. Разработчик уже уведомлён."
+            f"Извини, произошла внутренняя ошибка. Разработчик уже уведомлён. {error}"
         )
