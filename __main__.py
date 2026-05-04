@@ -5,21 +5,16 @@
 # importing os module for environment variables
 import os
 # importing necessary functions from dotenv library
-from dotenv import load_dotenv, dotenv_values 
+from dotenv import load_dotenv, dotenv_values
+# импорт библиотеки для логирования ошибок и сообщений
 import logging
 # importing necessary functions from telegram library
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
-
-
-# Импортируем функции работы с БД
-from db import init_db, add_user
-
 # импорт модуля для обработки команд и сообщений
 from handlers import unknown, start, echo, add_frend_birthday, help, error
 
 # loading variables from .env file
 load_dotenv() 
-
 # accessing and printing value
 TOKEN = os.getenv("BOT_TOKEN")
 

@@ -4,7 +4,7 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import init_db, add_user, add_new_frend
+from db import add_user, add_new_frend, is_user_exists
 from utils import validate_date, validate_only_letters, NotValidDate, NotValidName
 
 # для обработки ошибок
@@ -14,22 +14,23 @@ import logging
 
 # Определяем функцию для обработки команды /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # Инициализируем базу данных
-    init_db()
-    
     # Получаем данные пользователя
     user = update.effective_user
-    
-    # Добавляем пользователя в базу данных
-    add_user(
-        user_id=user.id,
-        username=user.username,
-        first_name=user.first_name,
-        last_name=user.last_name,
-    )
-    
-    # Отправляем приветственное сообщение
-    await update.message.reply_text(f'Привет, {user.first_name}! Я твой бот. Ты успешно зарегистрирован!')
+
+    if is_user_exists(user_id=user.id):
+        await update.message.reply_text(f'Ты уже зарегестрирован в системе!')
+    else:
+        # Добавляем пользователя в базу данных
+        add_user(
+            user_id=user.id,
+            username=user.username,
+            first_name=user.first_name,
+            last_name=user.last_name,
+        )
+        
+        # Отправляем приветственное сообщение
+        await update.message.reply_text(f'Привет, {user.first_name}! Я твой бот. Ты успешно зарегистрирован!')
+
 
 # Определяем функцию для обработки текстовых сообщений
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -41,6 +42,11 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 # Определяем функцию для обработки команды /add_frend_birthday
 async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # проверка наличия такого пользователя в БД
+    if not(is_user_exists(user_id=update.effective_user.id)):
+        await update.message.reply_text(f'Вас нет в системе, нажмите /start для начала')
+        return None
+
     # Получаем данные пользователя
     user = update.effective_user
     
