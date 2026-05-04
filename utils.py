@@ -9,7 +9,7 @@ import datetime
 def validate_date(date):
     # требуется дата в формате "29/03/2019"
     try:
-        current_day = datetime.datetime.strptime(date, "%d/%m/%Y")
+        current_day = datetime.datetime.strptime(date, "%d.%m.%Y")
     except Exception:
         print('Дата не по шаблону')
     
