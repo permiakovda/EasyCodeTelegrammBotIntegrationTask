@@ -88,11 +88,27 @@ def add_new_frend(user_id, frend_name, frend_birthday):
         cursor = conn.cursor()
 
         
+        # user_id = 1
+        # new_key = "city"
+        # new_value = "Amsterdam"
+
+        # cursor.execute(f"""
+        # UPDATE users
+        # SET info = json_set(info, '$.{new_key}', ?)
+        # WHERE id = ?
+        # """, (new_value, user_id))
+
+
+
+        popa = 'popa'
+
 
 
         # обновить данные нужного ползователя
         profile = {f"{frend_name}": f"{frend_birthday}"}
-        cursor.execute("UPDATE users SET frends_birthdays = ? WHERE user_id = ?", (json.dumps(profile, ensure_ascii=False), user_id))
+        # cursor.execute("UPDATE users SET frends_birthdays = ? WHERE user_id = ?", (json.dumps(profile, ensure_ascii=False), user_id))
+        
+        cursor.execute("UPDATE users SET frends_birthdays = json_patch(frends_birthdays, ?) WHERE user_id = ?", (json.dumps(profile, ensure_ascii=False), user_id))
         conn.commit()
 
         # получить инфу о существующих друзьях и их д.р.
@@ -101,7 +117,7 @@ def add_new_frend(user_id, frend_name, frend_birthday):
         
         if result and result[0]:
             # Предполагаем, что frends_birthdays хранится как JSON-строка
-            print( json.loads(result[0]))
+            print(json.loads(result[0]))
         else:
             print('пусто')   # Пустой список, если нет записей
 
