@@ -4,12 +4,15 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import add_user, add_new_frend, is_user_exists, get_frends_list, delete_frend_from_db
+from db import add_user, add_new_frend, is_user_exists, get_frends_list, delete_frend_from_db, get_all_users_with_birthdays
 from utils import validate_date, validate_only_letters, NotValidDate, NotValidName
-
+from datetime import datetime, timedelta
+# информация по временному поясу
+from zoneinfo import ZoneInfo
 # для обработки ошибок
 import traceback
 import logging
+
 
 
 # Определяем функцию для обработки команды /start
@@ -36,9 +39,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(update.message.text)
 
+
 # Определяем функцию для обработки неизвестных команд
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'такой команды нет')
+
 
 # Определяем функцию для обработки команды /add_frend_birthday
 async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -64,7 +69,6 @@ async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text('такое имя не подойдет (спец символы, пробелы, числа не должны присутствовать)')
 
 
-
 # Определяем функцию для обработки команды /frends_list
 async def frends_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # проверка наличия такого пользователя в БД
@@ -83,6 +87,7 @@ async def frends_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         frends_list_massage += f"{key}: {value} \n"
 
     await update.message.reply_text(frends_list_massage)
+
 
 # Определяем функцию для обработки команды /delete_frend
 async def delete_frend(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -130,3 +135,41 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.effective_message.reply_text(
             f"Извини, произошла внутренняя ошибка. {error}"
         )
+
+
+# отправка автоматических напоменаний
+# Часовой пояс (Москва, например)
+TIMEZONE = ZoneInfo("Europe/Moscow")
+async def check_birthdays(context: ContextTypes.DEFAULT_TYPE):
+    """
+    Ежедневная задача: проверяет дни рождения и отправляет напоминания.
+    Выполняется каждый день в 09:00.
+    """
+    today = datetime.now(TIMEZONE).date()
+
+    # Проверяем за +0, +1, +2, +3 дня
+    for days_ahead in [0, 1, 2, 3]:
+        target_date = today + timedelta(days=days_ahead)
+        formatted_date = target_date.strftime("%d.%m")  # ищем по DD.MM
+
+        # Получаем всех пользователей, у которых есть друг с этим ДР
+        users_with_matches = get_all_users_with_birthdays(formatted_date)
+
+        for user_id, friend_name in users_with_matches:
+            try:
+                if days_ahead == 0:
+                    message = f"🎉 Сегодня день рождения у *{friend_name}*! Не забудь поздравить!"
+                elif days_ahead == 1:
+                    message = f"📅 Завтра день рождения у *{friend_name}*! Готовь поздравление!"
+                elif days_ahead == 2:
+                    message = f"⏳ Через 2 дня день рождения у *{friend_name}*!"
+                else:  # days_ahead == 3
+                    message = f"🔔 Напоминание: через 3 дня день рождения у *{friend_name}*!"
+
+                await context.bot.send_message(
+                    chat_id=user_id,
+                    text=message,
+                    parse_mode='Markdown'
+                )
+            except Exception as e:
+                print('произошла ошибка отправки напоминания')

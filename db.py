@@ -176,3 +176,32 @@ def delete_frend_from_db(user_id, frend_name):
     finally:
         conn.close()
 
+def get_all_users_with_birthdays(target_date_str):
+    """
+    Возвращает список кортежей (user_id, friend_name), где у друга день рождения = target_date_str (формат DD.MM).
+    Предполагается, что frends_birthdays — это JSON-объект: {"Имя": "DD.MM", ...}
+    """
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+
+    result = []
+
+    try:
+        cursor.execute("SELECT user_id, frends_birthdays FROM users WHERE frends_birthdays IS NOT NULL")
+        rows = cursor.fetchall()
+
+        for user_id, data in rows:
+            try:
+                birthdays = json.loads(data)  # {"Анна": "15.04", "Иван": "23.12"}
+                for name, date in birthdays.items():
+                    if date.strip() == target_date_str:
+                        result.append((user_id, name))
+            except Exception as e:
+                print(f"Ошибка парсинга JSON для user_id {user_id}: {e}")
+
+    except Exception as e:
+        print(f"Ошибка при получении пользователей: {e}")
+    finally:
+        conn.close()
+
+    return result

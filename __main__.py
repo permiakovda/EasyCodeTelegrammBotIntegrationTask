@@ -8,18 +8,25 @@ import os
 from dotenv import load_dotenv
 # импорт библиотеки для логирования ошибок и сообщений
 import logging
+# информация по временному поясу
+from zoneinfo import ZoneInfo
+# работа с временем
+from datetime import time
 # importing necessary functions from telegram library
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, JobQueue
 # импорт модуля для обработки команд и сообщений
-from handlers import unknown, start, echo, add_frend_birthday, help, error, frends_list, delete_frend
+from handlers import unknown, start, echo, add_frend_birthday, help, error, frends_list, delete_frend, check_birthdays
 
 # loading variables from .env file
 load_dotenv() 
 # accessing and printing value
 TOKEN = os.getenv("BOT_TOKEN")
+# Часовой пояс (Москва, например)
+TIMEZONE = ZoneInfo("Europe/Moscow")
 
-# Включаем логирование
+# Настройка логирования
 logging.basicConfig(format='%(asctime)s — %(name)s — %(levelname)s — %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Основная функция
 def main():
@@ -38,6 +45,18 @@ def main():
 
     # Добавляем обработчик ошибок
     application.add_error_handler(error)
+
+    
+    # Получаем Job Queue
+    job_queue = application.job_queue
+
+    # Настраиваем ежедневную задачу в 09:00 по московскому времени
+    job_queue.run_daily(
+        check_birthdays,
+        time=time(hour=23, minute=5, tzinfo=TIMEZONE)
+    )
+
+    logger.info("Бот запущен. Напоминания настроены на 09:00 по МСК.")
 
     # Запускаем бота
     application.run_polling()
