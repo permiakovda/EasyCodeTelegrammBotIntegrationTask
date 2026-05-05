@@ -5,7 +5,7 @@
 # importing os module for environment variables
 import os
 # importing necessary functions from dotenv library
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
 # импорт библиотеки для логирования ошибок и сообщений
 import logging
 # importing necessary functions from telegram library

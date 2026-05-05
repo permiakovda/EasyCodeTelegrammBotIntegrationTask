@@ -100,7 +100,10 @@ async def delete_frend(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 # Определяем функцию для обработки команды /help
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Отправляем сообщение с инструкцией по использованию бота
-    await update.message.reply_text('Чтобы добавить друга с датой рождения, отправьте команду /add_frend_birthday и имя друга, а затем дату в формате ДД/ММ/ГГГГ, например: "/add_frend_birthday Иван 29/03/2019"')
+    await update.message.reply_text('Чтобы добавить друга с датой рождения, отправьте команду /add_frend_birthday и имя друга, а затем дату в ' \
+                                    'формате ДД/ММ/ГГГГ, например: "/add_frend_birthday Иван 29/03/2019". Что бы удалить друга напишите команду ' \
+                                    '/delete_frend и через пробел укажите его имя, например "/delete_frend Иван". Что бы посмотреть список друзей ' \
+                                    'используй команду /frends_list')
 
 
 # Функция-обработчик ошибок
