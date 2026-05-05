@@ -70,31 +70,6 @@ def is_user_exists(user_id):
 
 
 
-def get_user(user_id):
-    """
-    Получает данные пользователя по его user_id.
-    Возвращает словарь с данными или None, если пользователь не найден.
-    """
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    row = cursor.fetchone()
-    
-    conn.close()
-    
-    if row:
-        return {
-            'id': row[0],
-            'user_id': row[1],
-            'username': row[2],
-            'first_name': row[3],
-            'last_name': row[4],
-            'frends_birthdays': row[5]
-        }
-    return None
-
-
 def add_new_frend(user_id, frend_name, frend_birthday):
     """
     добавляем в бд информацию по новому другу и его ДР, если такого друга ещё нету в БД
@@ -133,3 +108,22 @@ def add_new_frend(user_id, frend_name, frend_birthday):
             conn.close()
             print("Соединение с SQLite закрыто")
 
+
+def get_frends_list(user_id):
+     # Определяем путь к базе данных
+        db_path = "users.db"
+        
+        # Создаем подключение к базе данных
+        conn = sqlite3.connect(db_path, check_same_thread=False)
+        cursor = conn.cursor()
+
+        # получить инфу о существующих друзьях и их д.р.
+        cursor.execute("SELECT frends_birthdays FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        
+        if result and result[0]:
+            # Предполагаем, что frends_birthdays хранится как JSON-строка
+            frends_birthdays = json.loads(result[0])
+            return frends_birthdays
+        else:
+            return None

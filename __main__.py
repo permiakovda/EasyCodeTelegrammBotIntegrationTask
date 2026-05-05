@@ -11,7 +11,7 @@ import logging
 # importing necessary functions from telegram library
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 # импорт модуля для обработки команд и сообщений
-from handlers import unknown, start, echo, add_frend_birthday, help, error
+from handlers import unknown, start, echo, add_frend_birthday, help, error, frends_list
 
 # loading variables from .env file
 load_dotenv() 
@@ -29,6 +29,7 @@ def main():
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('help', help))
     application.add_handler(CommandHandler('add_frend_birthday', add_frend_birthday))
+    application.add_handler(CommandHandler('frends_list', frends_list))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     # Добавляем обработчик для неизвестных команд

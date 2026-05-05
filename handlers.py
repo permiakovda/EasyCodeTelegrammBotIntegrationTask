@@ -4,7 +4,7 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import add_user, add_new_frend, is_user_exists
+from db import add_user, add_new_frend, is_user_exists, get_frends_list
 from utils import validate_date, validate_only_letters, NotValidDate, NotValidName
 
 # для обработки ошибок
@@ -62,6 +62,27 @@ async def add_frend_birthday(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text('информация отправлена не по рекомендуемому формату')
     except NotValidName as e:
         await update.message.reply_text('такое имя не подойдет (спец символы, пробелы, числа не должны присутствовать)')
+
+
+
+# Определяем функцию для обработки команды /frends_list
+async def frends_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # проверка наличия такого пользователя в БД
+    if not(is_user_exists(user_id=update.effective_user.id)):
+        await update.message.reply_text(f'Вас нет в системе, нажмите /start для начала')
+        return None
+
+    # Получаем данные пользователя
+    user = update.effective_user
+    
+    # Получаем информацию о друзьях
+    frends_list = get_frends_list(user_id=user.id)
+    frends_list_massage = ''
+
+    for key, value in zip(frends_list.keys(), frends_list.values()):
+        frends_list_massage += f"{key}: {value} \n"
+
+    await update.message.reply_text(frends_list_massage)
 
 
 
