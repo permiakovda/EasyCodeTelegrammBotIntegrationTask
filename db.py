@@ -110,20 +110,69 @@ def add_new_frend(user_id, frend_name, frend_birthday):
 
 
 def get_frends_list(user_id):
-     # Определяем путь к базе данных
-        db_path = "users.db"
+    """
+    просмотр списка друзей и их ДР
+    """
+    # Определяем путь к базе данных
+    db_path = "users.db"
         
-        # Создаем подключение к базе данных
-        conn = sqlite3.connect(db_path, check_same_thread=False)
-        cursor = conn.cursor()
+    # Создаем подключение к базе данных
+    conn = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = conn.cursor()
 
-        # получить инфу о существующих друзьях и их д.р.
-        cursor.execute("SELECT frends_birthdays FROM users WHERE user_id = ?", (user_id,))
-        result = cursor.fetchone()
+    # получить инфу о существующих друзьях и их д.р.
+    cursor.execute("SELECT frends_birthdays FROM users WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
         
+    if result and result[0]:
+        # Предполагаем, что frends_birthdays хранится как JSON-строка
+        frends_birthdays = json.loads(result[0])
+        cursor.close()
+        conn.close()
+        return frends_birthdays
+    else:
+        cursor.close()
+        conn.close()
+        return None
+
+    
+
+
+def delete_frend_from_db(user_id, frend_name):
+    """
+    удаляем друга
+    """
+    # Определяем путь к базе данных
+    db_path = "users.db"
+        
+    # Создаем подключение к базе данных
+    conn = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = conn.cursor()
+
+    # получить инфу о существующих друзьях и их д.р.
+    cursor.execute("SELECT frends_birthdays FROM users WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
+
+    # Формируем путь в JSON: $.frend_name
+    json_path = f"$.{frend_name}"
+    
+    try:
         if result and result[0]:
             # Предполагаем, что frends_birthdays хранится как JSON-строка
             frends_birthdays = json.loads(result[0])
-            return frends_birthdays
-        else:
-            return None
+            if frends_birthdays.get(frend_name) is not None:
+                cursor.execute("""
+                                UPDATE users 
+                                SET frends_birthdays = json_remove(frends_birthdays, ?)
+                                WHERE user_id = ? AND json_extract(frends_birthdays, ?) IS NOT NULL
+                                """, (json_path, user_id, json_path))
+                conn.commit()
+                return(f'друг {frend_name} успешно удален')
+            else:
+                return('такой друг не найден')
+    except Exception as e:
+        print(f"Ошибка при удалении друга: {e}")
+        return False
+    finally:
+        conn.close()
+

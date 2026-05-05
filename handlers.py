@@ -4,7 +4,7 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import add_user, add_new_frend, is_user_exists, get_frends_list
+from db import add_user, add_new_frend, is_user_exists, get_frends_list, delete_frend_from_db
 from utils import validate_date, validate_only_letters, NotValidDate, NotValidName
 
 # для обработки ошибок
@@ -84,7 +84,17 @@ async def frends_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     await update.message.reply_text(frends_list_massage)
 
+# Определяем функцию для обработки команды /delete_frend
+async def delete_frend(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # проверка наличия такого пользователя в БД
+    if not(is_user_exists(user_id=update.effective_user.id)):
+        await update.message.reply_text(f'Вас нет в системе, нажмите /start для начала')
+        return None
 
+    # Получаем данные пользователя
+    user = update.effective_user
+    #выполнить удаление пользователя по имени
+    await update.message.reply_text(delete_frend_from_db(user_id=user.id, frend_name=validate_only_letters(update.message.text.split(' ')[1])))
 
 
 # Определяем функцию для обработки команды /help
