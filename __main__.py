@@ -53,7 +53,7 @@ def main():
     # Настраиваем ежедневную задачу в 09:00 по московскому времени
     job_queue.run_daily(
         check_birthdays,
-        time=time(hour=23, minute=5, tzinfo=TIMEZONE)
+        time=time(hour=9, minute=0, tzinfo=TIMEZONE)
     )
 
     logger.info("Бот запущен. Напоминания настроены на 09:00 по МСК.")
